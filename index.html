@@ -3,44 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transform Game - Test</title>
+    <title>TRANSFORM - Geometry Puzzle Game</title>
+    
+    <!-- p5.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <h1>🎮 Transform Game</h1>
-    <p>If you can see this, everything is working!</p>
+    <div id="game-container">
+        <div id="game-header">
+            <div class="header-left">
+                <div class="game-title">⚡ TRANSFORM</div>
+                <div class="game-instruction">
+                    Move the <span class="cyan">cyan shape</span> to match the <span class="pink">pink target</span>
+                </div>
+            </div>
+            <div class="game-stats">
+                <div class="stat">
+                    <div class="stat-label">Level</div>
+                    <div class="stat-value" id="level-display">1</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Moves</div>
+                    <div class="stat-value" id="moves-display">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">World</div>
+                    <div class="stat-value">1</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="main-content">
+            <div id="controls-panel">
+                <!-- TRANSLATE TOOL -->
+                <div class="tool-section active" id="translate-tool" onclick="activateTool('translate')">
+                    <div class="tool-header">
+                        <div class="tool-title">↔️ Translate</div>
+                        <div class="tool-status active-status">Active</div>
+                    </div>
+                    <div class="tool-inputs">
+                        <div class="tool-row">
+                            <span class="tool-label">x:</span>
+                            <input type="number" id="translate-x" value="0" step="1" onclick="event.stopPropagation()">
+                        </div>
+                        <div class="tool-row">
+                            <span class="tool-label">y:</span>
+                            <input type="number" id="translate-y" value="0" step="1" onclick="event.stopPropagation()">
+                        </div>
+                        <button class="tool-button" onclick="event.stopPropagation(); applyTranslation();">
+                            Apply
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ROTATE TOOL -->
+                <div class="tool-section" id="rotate-tool" onclick="activateTool('rotate')">
+                    <div class="tool-header">
+                        <div class="tool-title">🔄 Rotate</div>
+                        <div class="tool-status">Click to activate</div>
+                    </div>
+                    <div class="tool-inputs">
+                        <div class="tool-row">
+                            <span class="tool-label">Point x:</span>
+                            <input type="number" id="rotate-x" value="0" step="1" onclick="event.stopPropagation()">
+                        </div>
+                        <div class="tool-row">
+                            <span class="tool-label">Point y:</span>
+                            <input type="number" id="rotate-y" value="0" step="1" onclick="event.stopPropagation()">
+                        </div>
+                        <div class="tool-row">
+                            <span class="tool-label">Angle:</span>
+                            <select id="rotate-angle" onclick="event.stopPropagation()">
+                                <option value="90">90°</option>
+                                <option value="180">180°</option>
+                                <option value="270">270°</option>
+                            </select>
+                        </div>
+                        <div class="tool-row">
+                            <span class="tool-label">Direction:</span>
+                            <select id="rotate-direction" onclick="event.stopPropagation()">
+                                <option value="anticlockwise">Anticlockwise</option>
+                                <option value="clockwise">Clockwise</option>
+                            </select>
+                        </div>
+                        <button class="tool-button" onclick="event.stopPropagation(); applyRotation();">
+                            Apply
+                        </button>
+                    </div>
+                </div>
+
+                <!-- REFLECT TOOL -->
+                <div class="tool-section" id="reflect-tool" onclick="activateTool('reflect')">
+                    <div class="tool-header">
+                        <div class="tool-title">📐 Reflect</div>
+                        <div class="tool-status">Click to activate</div>
+                    </div>
+                    <div class="tool-inputs">
+                        <div class="tool-row">
+                            <span class="tool-label">Axis:</span>
+                            <select id="reflect-axis" onchange="updateReflectInput()" onclick="event.stopPropagation()">
+                                <option value="y=">y =</option>
+                                <option value="x=">x =</option>
+                                <option value="y=x">y = x</option>
+                                <option value="y=-x">y = -x</option>
+                            </select>
+                        </div>
+                        <div class="tool-row" id="reflect-value-row">
+                            <span class="tool-label">Value:</span>
+                            <input type="number" id="reflect-value" value="0" step="1" onclick="event.stopPropagation()">
+                        </div>
+                        <button class="tool-button" onclick="event.stopPropagation(); applyReflection();">
+                            Apply
+                        </button>
+                    </div>
+                </div>
+
+                <!-- UTILITY BUTTONS -->
+                <div class="utility-buttons">
+                    <button class="util-button btn-undo" onclick="undoMove()" id="undo-btn" disabled>
+                        ↩️ Undo (-1 Move)
+                    </button>
+                    <button class="util-button btn-reset" onclick="resetLevel()">
+                        🔄 Reset Level
+                    </button>
+                </div>
+
+                <div id="message-box"></div>
+
+                <div class="hint-box" id="hint-box">
+                    💡 <strong>Level 1:</strong> Move the shape to match the target!
+                </div>
+            </div>
+
+            <div id="canvas-container">
+                <!-- p5.js canvas goes here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-title">🎉 LEVEL COMPLETE!</div>
+            <div class="modal-stars" id="modal-stars">⭐⭐⭐</div>
+            <div class="modal-stats" id="modal-stats">
+                Completed in <strong>X moves</strong><br>
+                Par: <strong>Y moves</strong>
+            </div>
+            <div class="modal-buttons" id="modal-buttons">
+                <button class="modal-button primary" onclick="nextLevel()">
+                    Next Level →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript modules -->
+    <script src="js/particles.js"></script>
+    <script src="js/levels.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/drawing.js"></script>
+    <script src="js/transformations.js"></script>
+    <script src="js/ui.js"></script>
 </body>
 </html>
-```
-
-### **6.2 - Save**
-- **Ctrl+S** (Windows/Linux)
-- **Cmd+S** (Mac)
-
-### **6.3 - Preview**
-
-**Method A: Live Server**
-- Right-click `index.html` in Explorer
-- Click **"Open with Live Server"**
-- Browser preview opens!
-
-**Method B: Python Server**
-- If you started Python server earlier, just open the URL Codespaces gave you
-- Should see your test page
-
-**✅ If you see "Transform Game" heading, you're golden!**
-
----
-
-## **STEP 7: Understanding the Workflow**
-
-From now on, your process is:
-```
-1. Edit code in VS Code (left side)
-   ↓
-2. Save (Ctrl+S)
-   ↓
-3. Preview updates automatically (right side)
-   ↓
-4. Test and iterate
-   ↓
-5. Repeat!
