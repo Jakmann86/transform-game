@@ -180,6 +180,18 @@ function drawCurrentShape() {
     drawingContext.shadowBlur = 0;
 }
 
+// Add this function to js/drawing.js (after drawCurrentShape)
+
+function drawGhostShape() {
+    if (!gameState.ghostShape || gameState.ghostOpacity <= 0) return;
+    
+    fill(0, 245, 255, gameState.ghostOpacity * 80);
+    stroke(0, 245, 255, gameState.ghostOpacity * 150);
+    strokeWeight(2);
+    
+    drawShapeFromPoints(gameState.ghostShape.points);
+}
+
 function drawShapeFromPoints(points) {
     if (points.length < 3) return;
     

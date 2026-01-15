@@ -31,7 +31,7 @@
                 </div>
                 <div class="stat">
                     <div class="stat-label">World</div>
-                    <div class="stat-value">1</div>
+                    <div class="stat-value" id="world-display">1</div>
                 </div>
             </div>
         </div>
@@ -105,8 +105,8 @@
                         <div class="tool-row">
                             <span class="tool-label">Axis:</span>
                             <select id="reflect-axis" onchange="updateReflectInput()" onclick="event.stopPropagation()">
-                                <option value="y=">y =</option>
                                 <option value="x=">x =</option>
+                                <option value="y=">y =</option>
                                 <option value="y=x">y = x</option>
                                 <option value="y=-x">y = -x</option>
                             </select>
@@ -124,7 +124,7 @@
                 <!-- UTILITY BUTTONS -->
                 <div class="utility-buttons">
                     <button class="util-button btn-undo" onclick="undoMove()" id="undo-btn" disabled>
-                        ↩️ Undo (-1 Move)
+                        ↩️ Undo (+1 Move)
                     </button>
                     <button class="util-button btn-reset" onclick="resetLevel()">
                         🔄 Reset Level
@@ -161,12 +161,14 @@
         </div>
     </div>
 
-    <!-- JavaScript modules -->
+    <!-- JavaScript modules - ORDER MATTERS -->
+    <script src="js/sounds.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/levels.js"></script>
     <script src="js/game.js"></script>
     <script src="js/drawing.js"></script>
     <script src="js/transformations.js"></script>
     <script src="js/ui.js"></script>
+    <script src="js/challengeMode.js" onerror="console.log('Challenge mode not loaded')"></script>
 </body>
 </html>
